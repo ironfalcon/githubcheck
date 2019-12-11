@@ -1,0 +1,83 @@
+{% load static %}
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <!--Import Google Icon Font-->
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <!-- fonts -->
+      <link href="https://fonts.googleapis.com/css?family=Nunito+Sans&display=swap" rel="stylesheet">
+      <!--Import materialize.css-->
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+      
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+      <link rel="stylesheet" href="/static/css/style.css">
+
+      <!--Let browser know website is optimized for mobile-->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+      <title>
+        {% block title %}
+            Default title
+        {% endblock %}
+      </title>
+    </head>
+
+    <body style="background-image: url('/static/img/123.jpg');"> 
+
+      
+    <nav>
+      <div class="nav-wrapper grey darken-4">
+        <a href="#" class="brand-logo center">
+            <img class="responsive-img" src="/static/img/GD_logo_2x.png" id="nav-img">
+        </a>
+      </div>
+    </nav>
+
+    {% block content %}
+        any content
+    {% endblock %}
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+          <h5>Result</h5>
+          <p id="result"></p>
+        </div>
+        <div class="modal-footer">
+          <a href="/" class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        $(document).on('submit', '#post-form',function(e){
+            e.preventDefault();
+            $.ajax({
+                type:'POST',
+                url:'{% url "create" %}',
+                data:{
+                    github_login:$('#github_login').val(),
+                    csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+                    action: 'post'
+                },
+                success:function(json){
+                    document.getElementById("post-form").reset();
+                    if (typeof(json.ldap) != "undefined"){
+                      document.getElementById("result").innerHTML = 'Логин: ' + json.github + ' принадлежит пользователю: ' + json.ldap;
+                      document.getElementById("result").className = "green-text text-accent-4";
+                    }
+                    else {
+                      document.getElementById("result").innerHTML = 'Пользователь ' + '< ' + json.github + ' >' + ' не зарегистрирован в PMO ' + '<br>' + 
+                      ' пожалуйста зарегистрируйте тикет в IT Jira: ' + '<a href="https://issues.griddynamics.net/secure/CreateIssue.jspa?pid=10004&issuetype=102">Request</a>';
+                      document.getElementById("result").className = "red-text text-darken-2";
+                    }
+                    $('#modal').modal();
+                    $('#modal').modal('open'); 
+                },
+                error : function(xhr,errmsg,err) {
+                $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+                    " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+                console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            }
+            });
+        });
+    </script>
+  </html>

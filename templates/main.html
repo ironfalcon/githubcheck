@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+    
+{% block title %}
+Main page
+{% endblock %}
+
+{% block content %}
+
+<div class="container z-depth-1 main-conteiner">
+        <div class="row ">
+            <div class="col s12">
+              <h3 id="form-heading">GitHub login check</h3>
+              <p>Check your github login for existing in PMO. In the field below, 
+                enter your GitHub login name, if a login exists, you will see  pop-up window 
+                indicating that login exist in the database. If your login does not exist in the PMO, 
+                you will be asked to follow the link and register your login in IT jira.<p>
+            </div>
+        </div>
+
+        {% if error_message %}
+        <div class="row">
+            <div class="col m12">
+                <p class="red-text text-darken-2">Login: {{ githublogin }} {{ error_message }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if ldap %}
+        <div class="row">
+            <div class="col m12">
+                <p class="green-text text-accent-4"> Ваш логин: {{ ldap }} существует в нашей системе PMO</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Ajax - article - https://dev.to/coderasha/how-to-send-django-form-with-ajax-4bpo -->
+
+        <form method="POST" id="post-form">
+            {% csrf_token %}
+            <div class="row">
+                <div class="input-field col m12 col l8">
+                    <input id="github_login" type="text" name="github_login" class="validate">
+                    <label class="active" for="github_login">GitHub login</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col m8">
+                    <button class="btn waves-effect waves-light" type="submit" name="action">Check
+                        <i class="material-icons right">send</i>
+                    </button>
+                </div>
+            </div>
+        </form>
+
+
+    </div>
+{% endblock %}
